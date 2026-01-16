@@ -147,7 +147,7 @@ const ActivityDetailModal: React.FC<{
 
           {/* Footer Info */}
           <div className="pt-6 border-t border-zinc-900 text-[10px] font-bold text-zinc-600 uppercase tracking-widest text-center">
-            Last Intelligence update: 2025 • Compiled via Profit Master AI
+            Last Intelligence update: 2025 • Compiled via LSProfit AI
           </div>
         </div>
       </div>
@@ -236,7 +236,7 @@ const ProfitMaster: React.FC = () => {
               $
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight gta-font leading-none uppercase">LOS SANTOS <span className="text-green-500">PROFIT MASTER</span></h1>
+              <h1 className="text-lg font-bold tracking-tight gta-font leading-none uppercase">LS<span className="text-green-500">PROFIT</span></h1>
               <p className="text-[10px] text-zinc-500 font-bold tracking-tighter uppercase opacity-70">Strategic Intelligence Unit</p>
             </div>
           </div>
