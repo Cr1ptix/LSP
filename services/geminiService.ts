@@ -1,18 +1,18 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { EventWeekData } from "../types";
+import { EventWeekData } from "../types.ts";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Safeguard against undefined process in browser
+const API_KEY = (window as any).process?.env?.API_KEY || "";
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 export async function fetchCurrentEventWeek(): Promise<EventWeekData> {
   const today = new Date();
   const dateString = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   
-  // Refined prompt to ensure the model focuses on the VERY latest data
   const prompt = `Search for the absolute latest GTA Online Weekly Update. 
   Today's date is ${dateString}. 
   Focus ONLY on news from the current week (most updates happen on Thursdays). 
-  DO NOT use information from last year or previous months.
   Look for 2x/3x Cash/RP bonuses on businesses, heists, or contact missions.
   Identify the top vehicle or property discounts.
   Identify the current podium vehicle and prize ride if possible.`;
@@ -29,7 +29,6 @@ export async function fetchCurrentEventWeek(): Promise<EventWeekData> {
     const text = response.text || "";
     const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     
-    // Improved source extraction
     const sources = groundingChunks
       .filter((chunk: any) => chunk.web)
       .map((chunk: any) => ({
@@ -37,13 +36,11 @@ export async function fetchCurrentEventWeek(): Promise<EventWeekData> {
         uri: chunk.web.uri,
       }));
 
-    // Secondary extraction to map search results to our structured schema
     const extractionPrompt = `Based on the following search results about the LATEST GTA Online event week:
     "${text}"
     
     Extract the details into this exact JSON format. 
-    Map bonuses to these internal IDs where appropriate: cayo-perico, diamond-casino, acid-lab, nightclub, bunker-stock, special-cargo, import-export, dr-dre-contract.
-    If a bonus doesn't fit those, use a short slug (e.g., 'hsw-races').
+    Map bonuses to these internal IDs where appropriate: cayo-perico, diamond-casino, acid-lab, nightclub, bunker-stock, cluckin-bell, dr-dre-contract, hsw-races.
 
     JSON Structure:
     {
@@ -86,20 +83,19 @@ export async function fetchCurrentEventWeek(): Promise<EventWeekData> {
     const data = JSON.parse(extractionResponse.text);
     return {
       ...data,
-      sources: sources.slice(0, 5) // Limit to top 5 high-quality sources
+      sources: sources.slice(0, 5)
     };
   } catch (error) {
     console.error("Error fetching event week data:", error);
-    // Fallback Mock Data with current year context
     return {
-      title: "Weekly Update (Fetch Failed)",
-      dateRange: "Current Week",
+      title: "Weekly Update Status Unknown",
+      dateRange: "Current Cycle",
       bonuses: [
         { activityId: 'acid-lab', multiplier: 2 },
-        { activityId: 'nightclub', multiplier: 2 }
+        { activityId: 'cluckin-bell', multiplier: 1 }
       ],
-      discounts: ["Check in-game for latest property sales"],
-      summary: "We're having trouble reaching the Rockstar Newswire. Showing standard high-efficiency businesses in the meantime.",
+      discounts: ["Check Rockstar Newswire for official list"],
+      summary: "Interface connection interrupted. Displaying default high-efficiency targets.",
       sources: []
     };
   }

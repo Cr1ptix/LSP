@@ -20,9 +20,9 @@ import {
   Target,
   Zap
 } from 'lucide-react';
-import { ACTIVITIES } from './constants';
-import { EventWeekData, CalculatedActivity } from './types';
-import { fetchCurrentEventWeek } from './services/geminiService';
+import { ACTIVITIES } from './constants.tsx';
+import { EventWeekData, CalculatedActivity } from './types.ts';
+import { fetchCurrentEventWeek } from './services/geminiService.ts';
 
 const formatProfit = (amount: number): string => {
   if (amount >= 1000000) {
@@ -53,7 +53,6 @@ const ActivityDetailModal: React.FC<{
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl bg-zinc-950 border border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300">
         
-        {/* Modal Header */}
         <div className="p-8 border-b border-zinc-900 bg-zinc-900/50 flex items-start justify-between shrink-0">
           <div>
             <div className="flex items-center space-x-3 mb-2">
@@ -78,10 +77,7 @@ const ActivityDetailModal: React.FC<{
           </button>
         </div>
 
-        {/* Modal Content - Scrollable */}
         <div className="p-8 overflow-y-auto space-y-10 custom-scrollbar">
-          
-          {/* Stats Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-6 bg-zinc-900/30 rounded-3xl border border-zinc-800/50">
             <div className="space-y-1">
               <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Est. Profit</p>
@@ -99,7 +95,6 @@ const ActivityDetailModal: React.FC<{
             </div>
           </div>
 
-          {/* Requirements Section */}
           <section>
             <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center mb-4">
               <Target className="w-4 h-4 mr-2 text-zinc-500" /> Operational Requirements
@@ -114,7 +109,6 @@ const ActivityDetailModal: React.FC<{
             </ul>
           </section>
 
-          {/* Instructions Section */}
           <section>
             <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center mb-4">
               <Zap className="w-4 h-4 mr-2 text-zinc-500" /> Step-By-Step Intel
@@ -133,7 +127,6 @@ const ActivityDetailModal: React.FC<{
             </div>
           </section>
 
-          {/* Special Tips Section */}
           {activity.specialTips && (
             <section className="p-6 bg-green-500/5 border border-green-500/20 rounded-3xl">
               <h3 className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em] mb-3 flex items-center">
@@ -145,7 +138,6 @@ const ActivityDetailModal: React.FC<{
             </section>
           )}
 
-          {/* Footer Info */}
           <div className="pt-6 border-t border-zinc-900 text-[10px] font-bold text-zinc-600 uppercase tracking-widest text-center">
             Last Intelligence update: 2025 • Compiled via LSProfit AI
           </div>
@@ -160,21 +152,22 @@ const ProfitMaster: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [fetchTime, setFetchTime] = useState<string>('');
-  
-  // Filter States
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [displayLimit, setDisplayLimit] = useState<number>(10);
-  
-  // Modal State
   const [selectedActivity, setSelectedActivity] = useState<CalculatedActivity | null>(null);
 
   const loadData = async () => {
     setIsRefreshing(true);
-    const data = await fetchCurrentEventWeek();
-    setEventData(data);
-    setFetchTime(new Date().toLocaleTimeString());
-    setLoading(false);
-    setIsRefreshing(false);
+    try {
+      const data = await fetchCurrentEventWeek();
+      setEventData(data);
+      setFetchTime(new Date().toLocaleTimeString());
+    } catch (err) {
+      console.error("Failed to load event data", err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -219,8 +212,6 @@ const ProfitMaster: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 pb-20">
-      
-      {/* Detail Modal Integration */}
       {selectedActivity && (
         <ActivityDetailModal 
           activity={selectedActivity} 
@@ -228,7 +219,6 @@ const ProfitMaster: React.FC = () => {
         />
       )}
 
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -258,13 +248,8 @@ const ProfitMaster: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Weekly Event Overview */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-              <Calendar className="w-48 h-48" />
-            </div>
-            
             <div className="relative z-10">
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <span className="px-3 py-1 bg-green-500 text-black text-[10px] font-black rounded uppercase tracking-widest">
@@ -323,13 +308,10 @@ const ProfitMaster: React.FC = () => {
             </div>
           </div>
 
-          {/* Sources Section */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest flex items-center">
-                <Info className="w-4 h-4 mr-2" /> Intelligence Sources
-              </h3>
-            </div>
+            <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest mb-6 flex items-center">
+              <Info className="w-4 h-4 mr-2" /> Intelligence Sources
+            </h3>
             <div className="space-y-2 flex-1 overflow-y-auto max-h-[400px] pr-1 custom-scrollbar">
               {eventData?.sources && eventData.sources.length > 0 ? (
                 eventData.sources.map((source, i) => (
@@ -344,9 +326,6 @@ const ProfitMaster: React.FC = () => {
                       <p className="text-xs font-bold text-zinc-200 group-hover:text-green-400 transition-colors truncate">
                         {source.title.replace(/GTA Online Weekly Update|New Weekly Update/gi, '').trim() || 'Rockstar Intel'}
                       </p>
-                      <p className="text-[10px] text-zinc-600 mt-0.5 truncate uppercase font-mono tracking-tighter">
-                        {new URL(source.uri).hostname}
-                      </p>
                     </div>
                     <ExternalLink className="w-3.5 h-3.5 text-zinc-700 group-hover:text-green-500 ml-3 transition-colors shrink-0" />
                   </a>
@@ -357,16 +336,9 @@ const ProfitMaster: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="mt-6 pt-6 border-t border-zinc-800">
-              <div className="flex items-center justify-center space-x-2 text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span>AI-Verified Content</span>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Tactical Filters and Top Results */}
         <section>
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -376,38 +348,16 @@ const ProfitMaster: React.FC = () => {
               </div>
               
               <div className="flex flex-wrap items-center gap-4">
-                {/* Category Filter */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1 flex items-center">
-                    <Filter className="w-3 h-3 mr-1" /> Category
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">
+                    <Filter className="w-3 h-3 inline mr-1" /> Category
                   </label>
                   <select 
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs font-bold px-4 py-2.5 rounded-xl outline-none focus:border-green-500/50 transition-colors min-w-[160px] cursor-pointer appearance-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+                    className="bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs font-bold px-4 py-2.5 rounded-xl outline-none min-w-[160px]"
                   >
-                    {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}s</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Limit Filter */}
-                <div className="flex flex-col space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1 flex items-center">
-                    <ListOrdered className="w-3 h-3 mr-1" /> Show Results
-                  </label>
-                  <select 
-                    value={displayLimit}
-                    onChange={(e) => setDisplayLimit(Number(e.target.value))}
-                    className="bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs font-bold px-4 py-2.5 rounded-xl outline-none focus:border-green-500/50 transition-colors min-w-[120px] cursor-pointer appearance-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
-                  >
-                    {LIMITS.map(limit => (
-                      <option key={limit} value={limit}>Top {limit}</option>
-                    ))}
-                    <option value={100}>All Activities</option>
+                    {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}s</option>)}
                   </select>
                 </div>
               </div>
@@ -415,135 +365,55 @@ const ProfitMaster: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {topActivities.length > 0 ? (
-              topActivities.map((activity, index) => (
-                <div 
-                  key={activity.id}
-                  onClick={() => setSelectedActivity(activity)}
-                  className={`group relative bg-zinc-900 border ${activity.isBonusActive ? 'border-green-500/40 ring-1 ring-green-500/10 shadow-[0_0_30px_rgba(34,197,94,0.05)]' : 'border-zinc-800'} rounded-[2rem] p-6 hover:border-zinc-600 transition-all duration-300 cursor-pointer overflow-hidden`}
-                >
-                  {activity.isBonusActive && (
-                    <div className="absolute top-0 right-0 bg-green-500 text-black text-[10px] font-black px-6 py-1.5 rounded-bl-3xl uppercase tracking-[0.2em] z-10 shadow-lg">
-                      {activity.multiplier}X ACTIVE
+            {topActivities.map((activity, index) => (
+              <div 
+                key={activity.id}
+                onClick={() => setSelectedActivity(activity)}
+                className={`group relative bg-zinc-900 border ${activity.isBonusActive ? 'border-green-500/40 shadow-lg' : 'border-zinc-800'} rounded-[2rem] p-6 hover:border-zinc-600 transition-all cursor-pointer`}
+              >
+                <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                  <div className="flex items-center space-x-6">
+                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl text-2xl font-black ${index === 0 ? 'bg-green-500 text-black shadow-lg' : 'bg-zinc-800 text-zinc-400'}`}>
+                      {index + 1}
                     </div>
-                  )}
-                  
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-8">
-                    {/* Rank & Category */}
-                    <div className="flex items-center space-x-6">
-                      <div className={`w-16 h-16 flex items-center justify-center rounded-2xl text-2xl font-black transition-transform group-hover:scale-110 duration-500 ${index === 0 ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]' : 'bg-zinc-800 text-zinc-400'}`}>
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-black text-white group-hover:text-green-400 transition-colors uppercase gta-font tracking-tight">{activity.name}</h3>
-                        <div className="flex items-center mt-1 space-x-3">
-                          <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-3 py-1 rounded-full bg-zinc-950 border border-zinc-800">
-                            {activity.category}
-                          </span>
-                          <div className="flex items-center space-x-1">
-                            {[1, 2, 3].map((step) => {
-                              const level = activity.difficulty === 'Easy' ? 1 : activity.difficulty === 'Medium' ? 2 : 3;
-                              return (
-                                <div key={step} className={`h-1 w-3 rounded-full ${step <= level ? 'bg-green-500' : 'bg-zinc-800'}`} />
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-white group-hover:text-green-400 transition-colors uppercase gta-font tracking-tight">{activity.name}</h3>
+                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-3 py-1 rounded-full bg-zinc-950 border border-zinc-800 mt-2 inline-block">
+                        {activity.category}
+                      </span>
                     </div>
+                  </div>
 
-                    {/* Profit Stats */}
-                    <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Efficiency Rating</span>
-                        <div className="flex items-baseline space-x-2">
-                          <span className={`text-3xl font-black font-mono ${activity.isBonusActive ? 'text-green-500' : 'text-zinc-100'}`}>
-                            ${formatProfit(activity.currentHourlyProfit)}<span className="text-sm font-bold text-zinc-600">/hr</span>
-                          </span>
-                          {activity.isBonusActive && (
-                            <span className="text-[10px] text-zinc-500 line-through font-mono">
-                              ${formatProfit(activity.baseHourlyProfit)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Time to Payout</span>
-                        <div className="flex items-center text-zinc-300">
-                          <Clock className="w-4 h-4 mr-3 text-zinc-600" />
-                          <span className="text-xl font-black font-mono tracking-tight">
-                            {formatDuration(activity.totalTime)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="hidden md:flex flex-col">
-                        <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Intelligence Summary</span>
-                        <p className="text-xs text-zinc-500 leading-tight italic line-clamp-2">
-                          {activity.description}
-                        </p>
-                      </div>
+                  <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Efficiency Rating</span>
+                      <span className={`text-3xl font-black font-mono ${activity.isBonusActive ? 'text-green-500' : 'text-zinc-100'}`}>
+                        ${formatProfit(activity.currentHourlyProfit)}<span className="text-sm font-bold text-zinc-600">/hr</span>
+                      </span>
                     </div>
-
-                    {/* Action Link / Arrow */}
-                    <div className="hidden lg:block">
-                      <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-green-500 transition-all duration-300 shadow-inner">
-                         <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-black transition-colors" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Time to Payout</span>
+                      <div className="flex items-center text-zinc-300">
+                        <Clock className="w-4 h-4 mr-3 text-zinc-600" />
+                        <span className="text-xl font-black font-mono">{formatDuration(activity.totalTime)}</span>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-20 bg-zinc-900/50 border border-zinc-800 rounded-[2rem] border-dashed">
-                <p className="text-zinc-500 gta-font uppercase tracking-widest">No matching activities found for this category.</p>
-              </div>
-            )}
-          </div>
-        </section>
 
-        {/* Pro Tips Section */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-orange-500/5 border border-orange-500/20 rounded-[2rem] p-8 flex items-start space-x-6">
-            <div className="p-4 bg-orange-500/10 rounded-2xl text-orange-500 shadow-inner">
-              <ShieldAlert className="w-8 h-8" />
-            </div>
-            <div>
-              <h4 className="text-orange-500 text-lg font-black uppercase tracking-tight mb-2 gta-font">Operational Fatigue</h4>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Remember the <span className="text-zinc-200 font-bold">48-minute Cayo Perico cooldown</span> for groups and <span className="text-zinc-200 font-bold">144-minute cooldown</span> for solo operatives. Use this downtime to restock your Acid Lab and sell Nightclub goods.
-              </p>
-            </div>
-          </div>
-          <div className="bg-blue-500/5 border border-blue-500/20 rounded-[2rem] p-8 flex items-start space-x-6">
-            <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-400 shadow-inner">
-              <TrendingUp className="w-8 h-8" />
-            </div>
-            <div>
-              <h4 className="text-blue-400 text-lg font-black uppercase tracking-tight mb-2 gta-font">Passive Synergies</h4>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Ensure your <span className="text-zinc-200 font-bold">Nightclub Technicians</span> are assigned to Cargo, Sporting Goods, and South American Imports. These businesses run 24/7 without resupply missions.
-              </p>
-            </div>
+                  <div className="hidden lg:block">
+                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-green-500 transition-all">
+                       <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-black" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 py-12 border-t border-zinc-900">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 hover:opacity-100 transition-opacity">
-          <div className="flex items-center space-x-4">
-            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Established 2025</div>
-          </div>
-          <p className="text-zinc-600 text-[10px] uppercase font-bold tracking-[0.2em] text-center">
-            Rockstar Games Intellectual Property Not Included • Data Powered by Gemini Vision
-          </p>
-          <div className="flex items-center space-x-6">
-             <div className="w-2 h-2 rounded-full bg-green-500" />
-             <div className="text-[10px] font-black uppercase tracking-widest text-zinc-600">System Nominal</div>
-          </div>
-        </div>
+      <footer className="max-w-7xl mx-auto px-4 py-12 border-t border-zinc-900 text-center text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+        LSProfit Intelligence Unit • Data Powered by Gemini Vision • Established 2025
       </footer>
     </div>
   );

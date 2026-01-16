@@ -2,15 +2,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Change 'LSProfit' to your actual repository name if it differs
+  // Ensure this matches your GitHub repository name exactly
   base: '/LSP/', 
   build: {
     outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false
   },
-  server: {
-    port: 3000,
+  define: {
+    'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
   }
 });
